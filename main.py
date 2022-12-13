@@ -21,9 +21,7 @@ pages_num = result['pages']
 vac_num = 0
 
 
-items = result['items']
 skills = []
-skills = set()
 sal = 0
 rate = ExchangeRates() # загрузка текущих курсов валют
 
@@ -34,8 +32,8 @@ for page in range(pages_num):
         'page': page
     }
     result_p = requests.get(url, params=params).json()
-
-    for item in result_p['items']:
+    items = result_p['items']
+    for item in items:
         vac_num += 1
         if not item['salary'] is None:
             if item['salary']['currency'] is None or item['salary']['currency']=='None':
@@ -53,21 +51,37 @@ for page in range(pages_num):
                     sal += sal_from*rate_cur
                 else:
                     sal += (sal_from + sal_to)*rate_cur/2
-        res_key_skills = requests.get(item[url]).json()
-        skills.add(res_key_skills['key_skills'])
-        time.sleep(1)
+        # новый запрос для вакансии по УРЛ для сборка ключевых навыков
+        res_key_skills = requests.get(item['url']).json()
+        # skills = [key_skill['name'] for key_skill in res_key_skills['key_skills']]
+        for key_skill in res_key_skills['key_skills']:
+            skills.append(key_skill['name'])
+        # time.sleep(0.5)
+# частотный анализ
+key_skills = {}
+key_skills_len = len(skills)
+kf = key_skills_len if key_skills_len >0 else 1
 
-print('По запросу ', name, ' в регионе ', region, ' нашли ', vac_num, ' вак.')
+for skill in skills:
+    # если он уже там есть
+    if skill in key_skills:
+        # то мы его увеличиваем на 1 долю от общего числа
+        key_skills[skill] += 1/kf
+    else:
+        # а если еще там нет
+        # то мы его записываем со значением 1 доли от общего числа
+        key_skills[skill] = 1/kf
+# сортировка по убыванию для ключ навыков
+skills_sorted = sorted(key_skills.items(), key=lambda x: x[1], reverse=True)
+print('По запросу ', name, ' в регионе ', region, ' найдено вакансий: ', vac_num)
 av_sal = sal/vac_num if vac_num != 0 else 0
-#    print('Средняя зарплата', sal/vac_num, ' руб.')
+
 to_print = {
         'keywords': name,
         'region': region,
         'count': vac_num,
         'ave_salary': round(av_sal),
-        'skills': skills}
+        'skills': skills_sorted}
 #with open('result.json', mode='w') as f:
 #    jdump([to_print], f)
 pprint.pprint(to_print)
-#print(result['items'][0]['url'])
-#print(result['items'][0]['alternate_url'])
