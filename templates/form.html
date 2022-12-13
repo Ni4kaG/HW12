@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            Поиск
+        </title>
+    </head>
+    <body>
+<!--    здесь будет форма поиска для отправки -->
+    <h1>
+        Параметры поиска вакансий
+    </h1>
+    <form action="result.html">
+        <input type="text" name="q_str" placeholder="наименование вакансии">
+        <br>
+
+        <p>
+            <select name="where">
+                <option value="all"> Везде</option>
+                <option value="inName"> в названии вакансии</option>
+                <option value="company">  в названии компании</option>
+            </select>
+        </p>
+        <br>
+        <br>
+        <input type="submit" value="Начать поиск">
+    </form>
+    <hr>
+
+<!--тут будет основная форма-->
+    <a href="index.html">
+        Перейти на главную страницу
+    </a>
+
+    </body>
+</html>
