@@ -1,6 +1,7 @@
 # Поиск вакансий
 import requests
 import pprint
+import time
 from pycbrf.toolbox import ExchangeRates
 
 url = 'https://api.hh.ru/vacancies'
@@ -52,7 +53,9 @@ for page in range(pages_num):
                     sal += sal_from*rate_cur
                 else:
                     sal += (sal_from + sal_to)*rate_cur/2
-        skills.add(item['snippet']['responsibility'])
+        res_key_skills = requests.get(item[url]).json()
+        skills.add(res_key_skills['key_skills'])
+        time.sleep(1)
 
 print('По запросу ', name, ' в регионе ', region, ' нашли ', vac_num, ' вак.')
 av_sal = sal/vac_num if vac_num != 0 else 0
